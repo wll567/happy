@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐！🎂</title>
+    <style>
+        /* 全局样式重置与基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #ffe6f2, #fff0e6, #f0f8ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景装饰元素 */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        body::before {
+            background: #ffccd5;
+            top: 10%;
+            left: 10%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        body::after {
+            background: #c5e1ff;
+            bottom: 10%;
+            right: 10%;
+            animation: float 10s ease-in-out infinite 2s;
+        }
+
+        /* 点击启动遮罩（新增） */
+        #startMask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 30px;
+            transition: opacity 0.8s ease;
+        }
+
+        #startMask h2 {
+            color: #e74c3c;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px 4px rgba(231, 76, 60, 0.2);
+            letter-spacing: 2px;
+        }
+
+        #startMask p {
+            color: #666;
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        #startMask .hand {
+            font-size: 2rem;
+            animation: wave 1.5s ease-in-out infinite;
+        }
+
+        /* 卡片主体样式 */
+        .birthday-card {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 650px;
+            padding: 50px 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(255, 153, 179, 0.2), 
+                        0 10px 20px rgba(102, 179, 255, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.5s ease;
+        }
+
+        .birthday-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* 顶部渐变边框 */
+        .birthday-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(90deg, 
+                #ff6b6b, #ff8e8e, #ffda79, #fff3bf, 
+                #6bcb77, #8fe399, #4ecdc4, #80e2e7, 
+                #7d7abc, #a09fe5, #ff80ff, #ffb3ff);
+            background-size: 200% 100%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        /* 角落装饰 */
+        .corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 4px solid #ffccd5;
+            opacity: 0.7;
+        }
+
+        .corner-top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 24px 0 0 0;
+        }
+
+        .corner-top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 24px 0 0;
+        }
+
+        .corner-bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 0 24px;
+        }
+
+        .corner-bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 24px 0;
+        }
+
+        /* 蛋糕样式 */
+        .cake-container {
+            margin: 0 auto 35px;
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .cake {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 8px rgba(0,0,0,0.1));
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        /* 蜡烛火焰动画 */
+        .flame {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 30px;
+            background: radial-gradient(circle, #ffeb3b 0%, #ff9800 70%, #f44336 100%);
+            border-radius: 50% 50% 20% 20%;
+            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(255, 152, 0, 0.8);
+            animation: flicker 0.8s ease-in-out infinite alternate;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 25px;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(231, 76, 60, 0.2);
+            letter-spacing: 2px;
+            animation: fadeInUp 1s ease forwards;
+            opacity: 0;
+        }
+
+        /* 祝福文字样式 */
+        .wishes {
+            background: linear-gradient(135deg, #fff8e6, #fff0f5);
+            padding: 25px;
+            border-radius: 16px;
+            margin: 30px 0;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+            animation: fadeInUp 1s ease 0.3s forwards;
+            opacity: 0;
+        }
+
+        .wishes p {
+            color: #333;
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .wishes p:last-child {
+            margin-bottom: 0;
+        }
+
+        .wishes p::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        /* 副标题样式 */
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 20px 0 30px;
+            font-weight: 500;
+            animation: fadeInUp 1s ease 0.6s forwards;
+            opacity: 0;
+        }
+
+        /* 签名样式 */
+        .signature {
+            margin-top: 40px;
+            color: #999;
+            font-style: italic;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            animation: fadeInUp 1s ease 0.9s forwards;
+            opacity: 0;
+        }
+
+        /* 装饰元素 - 小星星 */
+        .star {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ffd700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 3s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        /* 彩色纸屑样式优化 */
+        .confetti {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: fall 6s linear infinite;
+            z-index: -1;
+        }
+
+        /* 音乐控制按钮 */
+        .music-control {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffccd5, #ffb3ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 153, 179, 0.3);
+            transition: all 0.3s ease;
+            z-index: 10;
+            animation: fadeInUp 1s ease 1.2s forwards;
+            opacity: 0;
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 153, 179, 0.4);
+        }
+
+        .music-icon {
+            color: white;
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        /* 音乐可视化效果 */
+        .audio-visualizer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            opacity: 0.7;
+            animation: fadeInUp 1s ease 1.5s forwards;
+            opacity: 0;
+        }
+
+        .visualizer-bar {
+            width: 6px;
+            background: linear-gradient(to top, #ff6b6b, #ff80ff);
+            border-radius: 3px;
+            animation: audioPulse 0.8s ease-in-out infinite alternate;
+            height: 10px;
+        }
+
+        /* 新增：挥手动画 */
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(15deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-15deg); }
+        }
+
+        /* 原有动画定义 */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(15px, -15px) rotate(5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scaleY(0.9) scaleX(0.95); opacity: 0.8; }
+            100% { transform: translateX(-50%) scaleY(1.05) scaleX(1); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(800px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes audioPulse {
+            0% { height: 10px; }
+            100% { height: 35px; }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 576px) {
+            .birthday-card {
+                padding: 35px 20px;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .wishes p {
+                font-size: 1.1rem;
+            }
+
+            .cake-container {
+                width: 140px;
+                height: 140px;
+            }
+
+            .music-control {
+                width: 40px;
+                height: 40px;
+            }
+
+            .music-icon {
+                font-size: 1.2rem;
+            }
+
+            .audio-visualizer {
+                height: 30px;
+                gap: 3px;
+            }
+
+            .visualizer-bar {
+                width: 4px;
+            }
+
+            /* 响应式：启动遮罩文字调整 */
+            #startMask h2 {
+                font-size: 1.8rem;
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            #startMask p {
+                font-size: 1.1rem;
+                text-align: center;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增：点击启动遮罩 -->
+    <div id="startMask">
+        <h2>🎉 点击任意位置开启生日祝福 🎉</h2>
+        <p>音乐、彩带动画将同步启动～</p>
+        <span class="hand">🖐️</span>
+    </div>
+
+    <div class="birthday-card">
+        <!-- 角落装饰 -->
+        <div class="corner corner-top-left"></div>
+        <div class="corner corner-top-right"></div>
+        <div class="corner corner-bottom-left"></div>
+        <div class="corner corner-bottom-right"></div>
+
+        <!-- 音乐控制按钮 -->
+        <div class="music-control" id="musicControl">
+            <span class="music-icon" id="musicIcon">▶️</span>
+        </div>
+
+        <!-- 蛋糕与火焰 -->
+        <div class="cake-container">
+            <img src="C:\Users\21801\Desktop\新建文件夹\生日蛋糕.png" alt="生日蛋糕" class="cake">
+            <div class="flame"></div>
+        </div>
+
+        <h1>生日快乐！🎂</h1>
+
+        <div class="wishes">
+            <p>愿你的每一天都像今天一样甜蜜，</p>
+            <p>愿所有美好与幸运都如期而至，</p>
+            <p>愿新的一岁，平安喜乐，万事胜意，</p>
+            <p>眼里有光，心中有爱，不负韶华！</p>
+        </div>
+
+        <p class="subtitle">愿这个特别的日子，充满欢笑与温暖 ✨</p>
+
+        <div class="signature">
+                    ❤️
+        </div>
+
+        <!-- 音乐可视化效果 -->
+        <div class="audio-visualizer" id="audioVisualizer">
+            <!-- 动态生成音频可视化条 -->
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="birthdayMusic" loop preload="auto">
+        <source src="C:\Users\21801\Desktop\新建文件夹\shengrichufuge.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+
+    <script>
+        // 创建随机彩色纸屑
+        function createConfetti() {
+            const confettiCount = 150;
+            const colors = [
+                '#ff6b6b', '#ff8e8e', '#ffda79', '#fff3bf',
+                '#6bcb77', '#8fe399', '#4ecdc4', '#80e2e7',
+                '#7d7abc', '#a09fe5', '#ff80ff', '#ffb3ff',
+                '#ffd700', '#ffb900', '#ff69b4', '#ff91a4'
+            ];
+            const container = document.body;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                // 随机大小和形状
+                const size = Math.random() * 12 + 6;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${Math.random() > 0.5 ? size : size / 2}px`;
+                confetti.style.borderRadius = `${Math.random() > 0.5 ? '50%' : '20%'}`;
+                
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = `${Math.random() * 4 + 3}s`;
+                confetti.style.animationDelay = `${Math.random() * 6}s`;
+                
+                container.appendChild(confetti);
+
+                // 动画结束后移除
+                setTimeout(() => {
+                    confetti.remove();
+                }, 8000);
+            }
+        }
+
+        // 创建随机小星星装饰
+        function createStars() {
+            const starCount = 20;
+            const container = document.querySelector('.birthday-card');
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = `${Math.random() * 95}%`;
+                star.style.top = `${Math.random() * 95}%`;
+                star.style.animationDuration = `${Math.random() * 4 + 2}s`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(star);
+            }
+        }
+
+        // 初始化音乐可视化
+        function initAudioVisualizer() {
+            const visualizer = document.getElementById('audioVisualizer');
+            const barCount = 20; // 可视化条数量
+
+            // 创建可视化条
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                bar.classList.add('visualizer-bar');
+                // 为每个条设置不同的动画延迟，营造错落感
+                bar.style.animationDelay = `${i * 0.05}s`;
+                visualizer.appendChild(bar);
+            }
+
+            // 默认隐藏可视化效果
+            visualizer.style.opacity = '0';
+        }
+
+        // 音乐控制功能（整合点击启动）
+        function initMusicControl() {
+            const audio = document.getElementById('birthdayMusic');
+            const musicControl = document.getElementById('musicControl');
+            const musicIcon = document.getElementById('musicIcon');
+            const visualizer = document.getElementById('audioVisualizer');
+            const startMask = document.getElementById('startMask');
+            let isPlaying = false;
+
+            // 关键：监听页面首次点击（任意位置）
+            function handleFirstClick() {
+                // 播放音乐
+                audio.play().then(() => {
+                    isPlaying = true;
+                    musicIcon.textContent = '⏸️';
+                    visualizer.style.opacity = '0.7';
+                    // 隐藏启动遮罩（渐变动画）
+                    startMask.style.opacity = '0';
+                    setTimeout(() => {
+                        startMask.style.display = 'none';
+                    }, 800);
+                    // 首次点击后立即创建一次纸屑（增强仪式感）
+                    createConfetti();
+                }).catch(err => {
+                    console.log('播放失败：', err);
+                    alert('音乐播放失败，请检查浏览器设置或刷新页面重试～');
+                });
+
+                // 移除监听（只触发一次）
+                document.removeEventListener('click', handleFirstClick);
+            }
+
+            // 页面加载后，监听首次点击
+            document.addEventListener('click', handleFirstClick);
+
+            // 音乐按钮控制播放/暂停
+            musicControl.addEventListener('click', () => {
+                if (isPlaying) {
+                    audio.pause();
+                    musicIcon.textContent = '▶️';
+                    visualizer.style.opacity = '0';
+                } else {
+                    audio.play();
+                    musicIcon.textContent = '⏸️';
+                    visualizer.style.opacity = '0.7';
+                }
+                isPlaying = !isPlaying;
+            });
+        }
+
+        // 页面加载完成后执行
+        window.onload = () => {
+            createStars(); // 先创建星星（不依赖点击）
+            initAudioVisualizer();
+            initMusicControl();
+            
+            // 定时重复创建纸屑（点击后开始循环）
+            setInterval(createConfetti, 7000);
+        };
+    </script>
+</body>
+</html>
